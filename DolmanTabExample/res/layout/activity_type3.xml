@@ -1,0 +1,24 @@
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".ActivityType3" 
+    android:orientation="vertical">
+    
+    <info.mabin.android.dolmantab.DolmanTabLayout
+        android:id="@+id/tabLayout"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_weight="1" >
+
+    </info.mabin.android.dolmantab.DolmanTabLayout>
+
+     <info.mabin.android.dolmantab.DolmanTabWidget
+         android:id="@+id/tabWidget"
+         android:layout_width="match_parent"
+         android:layout_height="50dp"
+         android:layout_weight="0"
+         android:background="@drawable/dirt_pattern" >
+
+    </info.mabin.android.dolmantab.DolmanTabWidget>
+</LinearLayout>

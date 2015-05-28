@@ -1,0 +1,136 @@
+package info.mabin.android.dolmantab.example;
+
+import java.util.ArrayList;
+import java.util.List;
+
+import android.os.Bundle;
+import android.content.Context;
+import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentActivity;
+import android.util.Log;
+import android.view.animation.AccelerateInterpolator;
+import android.view.animation.DecelerateInterpolator;
+import info.mabin.android.bundleanimator.AnimatorInfoSet;
+import info.mabin.android.bundleanimator.ObjectAnimatorInfo;
+import info.mabin.android.dolmantab.DolmanTabInterface;
+import info.mabin.android.dolmantab.DolmanTabWidget;
+import info.mabin.android.dolmantab.DolmanTabLayout;
+import info.mabin.android.dolmantab.DolmanTabAdapter;
+
+public class ActivityType3 extends FragmentActivity {
+	@Override
+	protected void onCreate(Bundle savedInstanceState) {
+		super.onCreate(savedInstanceState);
+		setContentView(R.layout.activity_type3);
+
+		DolmanTabLayout dolmanTabLayout = (DolmanTabLayout) findViewById(R.id.tabLayout);
+		DolmanTabWidget dolmanTabWidget = (DolmanTabWidget) findViewById(R.id.tabWidget);
+		
+		TabsAdapter tabsAdapter = new TabsAdapter(this, dolmanTabLayout);
+
+		dolmanTabLayout.setTabWidget(dolmanTabWidget);
+		dolmanTabLayout.setPageAnimator(new CustomPageAnimator());
+		
+		dolmanTabWidget.setIndicator(R.layout.tab_indicator_stone);
+		
+		tabsAdapter.addTab(dolmanTabLayout.newTab().setText("Front"), Fragment1.class, null);
+		tabsAdapter.addTab(dolmanTabLayout.newTab().setText("Back"), Fragment2.class, null);
+		tabsAdapter.addTab(dolmanTabLayout.newTab().setText("Text"), Fragment3.class, null);
+	}
+
+	private class TabsAdapter extends DolmanTabAdapter{
+		private List<Fragment> listFragment = new ArrayList<Fragment>();
+
+		public TabsAdapter(Context context, DolmanTabLayout layout) {
+			super(context, layout);
+		}
+
+		@Override
+		public void addTab(DolmanTabWidget.Tab tab, Class<?> clss, Bundle args){
+			Fragment tabFragment = Fragment.instantiate(ActivityType3.this, clss.getName());
+			listFragment.add(tabFragment);
+
+			super.addTab(tab, clss, args);
+		}
+
+		@Override
+		public Fragment getItem(int position) {
+			return listFragment.get(position);
+		}
+
+		@Override
+		public int getCount() {
+			return listFragment.size();
+		}
+
+		@Override
+		public void onTabSelected(int position, DolmanTabLayout layout) {
+			Log.d("onTabSelected", "Position: " + position);
+			layout.setCurrentTab(position);
+		}
+
+		@Override
+		public void onTabUnselected(int position, DolmanTabLayout layout) {
+			Log.d("onTabUnSelected", "Position: " + position);
+		}
+
+		@Override
+		public void onTabReselected(int position, DolmanTabLayout layout) {
+			Log.d("onTabReSelected", "Position: " + position);
+		}
+
+		@Override
+		public void onPageSelected(int position, DolmanTabWidget widget) {
+			widget.setCurrentTab(position);
+		}
+
+		@Override
+		public void onPageUnselected(int position, DolmanTabWidget widget) {}
+
+		@Override
+		public void onPageScrolled(int position, float positionOffset,
+				DolmanTabWidget widget) {
+			widget.moveTabLocation(position, positionOffset);
+		}
+	}
+	
+	private class CustomPageAnimator implements DolmanTabInterface.PageAnimator{
+		@Override
+		public void animationForward(AnimatorInfoSet currentSet,
+				AnimatorInfoSet nextSet) {
+			currentSet.playTogether(
+					ObjectAnimatorInfo.ofFloat("rotationY", 0, -90).setDuration(200).setInterpolator(new DecelerateInterpolator()),
+					ObjectAnimatorInfo.ofFloat("x", 0, -1080).setDuration(200),
+					ObjectAnimatorInfo.ofFloat("scaleX", 1f, 1.5f).setDuration(200),
+					ObjectAnimatorInfo.ofFloat("scaleY", 1f, 1.5f).setDuration(200),
+					ObjectAnimatorInfo.ofFloat("alpha", 1f, 0f).setDuration(200)
+					);
+			nextSet.playTogether(
+					ObjectAnimatorInfo.ofFloat("rotationY", 0, 0).setDuration(200),
+					ObjectAnimatorInfo.ofFloat("x", 0, 0).setDuration(200),
+					ObjectAnimatorInfo.ofFloat("scaleX", 0.5f, 1f).setDuration(200),
+					ObjectAnimatorInfo.ofFloat("scaleY", 0.5f, 1f).setDuration(200),
+					ObjectAnimatorInfo.ofFloat("alpha", 1f, 1f).setDuration(200)
+					);
+		}
+
+		@Override
+		public void animationBackward(AnimatorInfoSet currentSet,
+				AnimatorInfoSet nextSet) {
+			currentSet.playTogether(
+					ObjectAnimatorInfo.ofFloat("rotationY", 0, 0).setDuration(200),
+					ObjectAnimatorInfo.ofFloat("x", 0, 0).setDuration(200),
+					ObjectAnimatorInfo.ofFloat("scaleX", 1f, 0.5f).setDuration(200),
+					ObjectAnimatorInfo.ofFloat("scaleY", 1f, 0.5f).setDuration(200),
+					ObjectAnimatorInfo.ofFloat("alpha", 1f, 1f).setDuration(200)
+					);
+			nextSet.playTogether(
+					ObjectAnimatorInfo.ofFloat("rotationY", -90, 0).setDuration(200).setInterpolator(new AccelerateInterpolator()),
+					ObjectAnimatorInfo.ofFloat("x", -1080, 0).setDuration(200),
+					ObjectAnimatorInfo.ofFloat("scaleX", 1.5f, 1f).setDuration(200),
+					ObjectAnimatorInfo.ofFloat("scaleY", 1.5f, 1f).setDuration(200),
+					ObjectAnimatorInfo.ofFloat("alpha", 0f, 1f).setDuration(200)
+					);
+		}
+	}
+}
