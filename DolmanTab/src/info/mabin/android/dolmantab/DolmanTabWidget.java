@@ -221,18 +221,18 @@ public class DolmanTabWidget extends RelativeLayout{
 		tabIndicatorExtra.addView(view);
 	}
 */	
-	public void setIndicator(int resId){
-		View tmpView = View.inflate(context, resId, null);
+	public void setIndicator(int resIdLayout){
+		View tmpView = View.inflate(context, resIdLayout, null);
 		tabIndicator.removeAllViews();
 		tabIndicator.addView(tmpView);
 		
-		tmpView = View.inflate(context, resId, null);
+		tmpView = View.inflate(context, resIdLayout, null);
 		tabIndicatorExtra.removeAllViews();
 		tabIndicatorExtra.addView(tmpView);
 	}
 	
 	public void setWidgetBackground(View view){
-		this.setBackgroundDrawable(null);
+		this.setBackgroundResource(0);
 		widgetBackground.removeAllViews();
 		widgetBackground.addView(view);
 	}
