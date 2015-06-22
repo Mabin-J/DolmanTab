@@ -1,5 +1,6 @@
 package info.mabin.android.dolmantab;
 
+import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -16,6 +17,7 @@ public class FragmentAnimator implements FragmentAnimatorListener{
 	private BundleAnimator animatorNext = new BundleAnimator();
 	
 	private BundleAnimator handlerEvent;
+	
 	
 	private boolean isStarted = false;
 	
@@ -99,6 +101,12 @@ public class FragmentAnimator implements FragmentAnimatorListener{
 			public void onAnimationEnd(BundleAnimator animation) {
 				FragmentAnimator.this.onAnimationEnd(FragmentAnimator.this);
 			}
+
+
+			@Override
+			public void onAnimationEndReverse(BundleAnimator animator) {
+				FragmentAnimator.this.onAnimationEndReverse(FragmentAnimator.this);
+			}
 			
 			@Override
 			public void onAnimationCancel(BundleAnimator animation) {}
@@ -108,7 +116,6 @@ public class FragmentAnimator implements FragmentAnimatorListener{
 			
 			@Override
 			public void onAnimationRepeat(BundleAnimator animation) {}
-
 		};
 		
 		if(handlerEvent != null){
@@ -183,6 +190,13 @@ public class FragmentAnimator implements FragmentAnimatorListener{
 	public void onAnimationPlaying(FragmentAnimator animation, long currentTime) {
 		for(FragmentAnimatorListener listener: listListener){
 			listener.onAnimationPlaying(animation, currentTime);
+		}
+	}
+	
+	@Override
+	public void onAnimationEndReverse(FragmentAnimator animation) {
+		for(FragmentAnimatorListener listener: listListener){
+			listener.onAnimationEndReverse(animation);
 		}
 	}
 }

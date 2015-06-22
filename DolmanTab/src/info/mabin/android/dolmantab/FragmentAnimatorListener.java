@@ -6,4 +6,5 @@ public interface FragmentAnimatorListener{
 	public void onAnimationCancel(FragmentAnimator animation);
 	public void onAnimationRepeat(FragmentAnimator animation);
 	public void onAnimationPlaying(FragmentAnimator animation, long currentTime);
+	public void onAnimationEndReverse(FragmentAnimator animation);
 }
