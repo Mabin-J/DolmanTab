@@ -140,27 +140,27 @@ public class DolmanTabLayout extends RelativeLayout{
 		
 		layoutAnimation = new RelativeLayout(context);
 		layoutAnimation.setBackgroundColor(Color.TRANSPARENT);
-		layoutAnimation.setLayoutParams(new LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.MATCH_PARENT));
+		layoutAnimation.setLayoutParams(fragmentLayoutParams);
 		this.addView(layoutAnimation);
 		
 		arrViewAnimation[0] = new RelativeLayout(context);
 		arrViewAnimation[0].setBackgroundColor(Color.TRANSPARENT);
 		arrViewAnimation[0].setVisibility(VISIBLE);
 		arrViewAnimation[0].setId(DolmanTabLayout.customGenerateViewId());
-		arrViewAnimation[0].setLayoutParams(fragmentLayoutParams);
+		arrViewAnimation[0].setLayoutParams(new LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.MATCH_PARENT));
 
 		arrViewAnimation[1] = new RelativeLayout(context);
 		arrViewAnimation[1].setBackgroundColor(Color.TRANSPARENT);
 		arrViewAnimation[1].setVisibility(VISIBLE);
 		arrViewAnimation[1].setId(DolmanTabLayout.customGenerateViewId());
-		arrViewAnimation[1].setLayoutParams(fragmentLayoutParams);
+		arrViewAnimation[1].setLayoutParams(new LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.MATCH_PARENT));
 
 		layoutAnimation.addView(arrViewAnimation[1]);
 		layoutAnimation.addView(arrViewAnimation[0]);
 		
 		layoutRealView = new RelativeLayout(context);
 		layoutRealView.setBackgroundColor(Color.TRANSPARENT);
-		layoutRealView.setLayoutParams(new LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.MATCH_PARENT));
+		layoutRealView.setLayoutParams(fragmentLayoutParams);
 
 		this.addView(layoutRealView);
 		
@@ -170,20 +170,20 @@ public class DolmanTabLayout extends RelativeLayout{
 		arrViewFragment[0].setBackgroundColor(Color.TRANSPARENT);
 		arrViewFragment[0].setVisibility(VISIBLE);
 		arrViewFragment[0].setId(DolmanTabLayout.customGenerateViewId());
-		arrViewFragment[0].setLayoutParams(fragmentLayoutParams);
+		arrViewFragment[0].setLayoutParams(new LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.MATCH_PARENT));
 
 		arrViewFragment[1] = new FrameLayout(context);
 		arrViewFragment[1].setBackgroundColor(Color.TRANSPARENT);
 		arrViewFragment[1].setVisibility(VISIBLE);
 		arrViewFragment[1].setId(DolmanTabLayout.customGenerateViewId());
-		arrViewFragment[1].setLayoutParams(fragmentLayoutParams);
+		arrViewFragment[1].setLayoutParams(new LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.MATCH_PARENT));
 		
 		layoutRealView.addView(arrViewFragment[1]);
 		layoutRealView.addView(arrViewFragment[0]);
 
 		layoutTouch = new TouchLayout(context);
 		layoutTouch.setBackgroundColor(Color.TRANSPARENT);
-		layoutTouch.setLayoutParams(new LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.MATCH_PARENT));
+		layoutTouch.setLayoutParams(fragmentLayoutParams);
 		this.addView(layoutTouch);
 		
 		fragmentAnimator = new FragmentAnimator();
@@ -255,6 +255,7 @@ public class DolmanTabLayout extends RelativeLayout{
 
 	public void setCurrentTab(int targetTabIndex){
 		if(pageAnimator == null){
+			tabIndexNext = targetTabIndex;
 			tabAnimatorListener.onAnimationStart(null);
 			tabAnimatorListener.onAnimationEnd(null);
 		} else {
@@ -371,20 +372,19 @@ public class DolmanTabLayout extends RelativeLayout{
 		private FrameLayout tmpLayout;
 		@Override
 		public void onAnimationStart(FragmentAnimator animation) {
-
-			if(animation != null && animation.getDirection() == Direction.Forward){
-				arrViewAnimation[1].setVisibility(INVISIBLE);
-				layoutAnimation.removeView(arrViewAnimation[0]);
-				layoutAnimation.addView(arrViewAnimation[0]);
-				arrViewAnimation[1].setVisibility(VISIBLE);
-			} else {
-				arrViewAnimation[0].setVisibility(INVISIBLE);
-				layoutAnimation.removeView(arrViewAnimation[1]);
-				layoutAnimation.addView(arrViewAnimation[1]);
-				arrViewAnimation[0].setVisibility(VISIBLE);
+			if(animation != null){
+				if(animation != null && animation.getDirection() == Direction.Forward){
+					arrViewAnimation[1].setVisibility(INVISIBLE);
+					layoutAnimation.removeView(arrViewAnimation[0]);
+					layoutAnimation.addView(arrViewAnimation[0]);
+					arrViewAnimation[1].setVisibility(VISIBLE);
+				} else {
+					arrViewAnimation[0].setVisibility(INVISIBLE);
+					layoutAnimation.removeView(arrViewAnimation[1]);
+					layoutAnimation.addView(arrViewAnimation[1]);
+					arrViewAnimation[0].setVisibility(VISIBLE);
+				}
 			}
-
-			arrIsCapture[1] = false;
 			
 			final Fragment nextFragment = tabAdapter.getItem(tabIndexNext);
 			
@@ -395,50 +395,52 @@ public class DolmanTabLayout extends RelativeLayout{
 			tabWidget.lockTouch();
 
 			Log.d("AnimatorEvent", "Start");
-			
-			if(isInit){
-				if(arrBitmapAnimation[0] == null){
-					arrBitmapAnimation[0] = Bitmap.createBitmap(arrViewFragment[0].getWidth(),
-							arrViewFragment[0].getHeight(),
-							Bitmap.Config.ARGB_8888);
+			if(animation != null){
+				
+				if(isInit){
+					if(arrBitmapAnimation[0] == null){
+						arrBitmapAnimation[0] = Bitmap.createBitmap(arrViewFragment[0].getWidth(),
+								arrViewFragment[0].getHeight(),
+								Bitmap.Config.ARGB_8888);
+		
+						arrBitmapAnimation[1] = Bitmap.createBitmap(arrViewFragment[1].getWidth(),
+								arrViewFragment[1].getHeight(),
+								Bitmap.Config.ARGB_8888);
+					} else {
+						arrBitmapAnimation[0].eraseColor(Color.TRANSPARENT);
+						arrBitmapAnimation[1].eraseColor(Color.TRANSPARENT);
+					}
+					
+					
+					arrViewFragment[0].draw(new Canvas(arrBitmapAnimation[0]));
 	
-					arrBitmapAnimation[1] = Bitmap.createBitmap(arrViewFragment[1].getWidth(),
-							arrViewFragment[1].getHeight(),
-							Bitmap.Config.ARGB_8888);
-				} else {
-					arrBitmapAnimation[0].eraseColor(Color.TRANSPARENT);
-					arrBitmapAnimation[1].eraseColor(Color.TRANSPARENT);
+					BitmapDrawable tmpDrawable = new BitmapDrawable(arrBitmapAnimation[0]);
+					arrViewAnimation[0].setBackgroundDrawable(tmpDrawable);
+					
+					arrViewFragment[1].getViewTreeObserver().addOnPreDrawListener(new ViewTreeObserver.OnPreDrawListener() {
+						
+						@Override
+						public boolean onPreDraw() {
+							if(nextFragment.getView() != null){
+								getViewTreeObserver().removeOnPreDrawListener(this);
+	
+								arrBitmapAnimation[1].eraseColor(Color.TRANSPARENT);
+	
+								arrViewFragment[1].draw(new Canvas(arrBitmapAnimation[1]));
+		
+								BitmapDrawable tmpDrawable = new BitmapDrawable(arrBitmapAnimation[1]);
+								arrViewAnimation[1].setBackgroundDrawable(tmpDrawable);
+							}
+							return true;
+						}
+					});
 				}
 				
-				
-				arrViewFragment[0].draw(new Canvas(arrBitmapAnimation[0]));
-
-				BitmapDrawable tmpDrawable = new BitmapDrawable(arrBitmapAnimation[0]);
-				arrViewAnimation[0].setBackgroundDrawable(tmpDrawable);
-				
-				arrViewFragment[1].getViewTreeObserver().addOnPreDrawListener(new ViewTreeObserver.OnPreDrawListener() {
-					
-					@Override
-					public boolean onPreDraw() {
-						if(nextFragment.getView() != null){
-							getViewTreeObserver().removeOnPreDrawListener(this);
-
-							arrBitmapAnimation[1].eraseColor(Color.TRANSPARENT);
-
-							arrViewFragment[1].draw(new Canvas(arrBitmapAnimation[1]));
-	
-							BitmapDrawable tmpDrawable = new BitmapDrawable(arrBitmapAnimation[1]);
-							arrViewAnimation[1].setBackgroundDrawable(tmpDrawable);
-						}
-						return true;
-					}
-				});
+				layoutAnimation.setVisibility(VISIBLE);
+				layoutRealView.setVisibility(INVISIBLE);
+				arrViewFragment[1].setVisibility(INVISIBLE);
+				arrViewFragment[0].setVisibility(INVISIBLE);
 			}
-			
-			layoutAnimation.setVisibility(VISIBLE);
-			layoutRealView.setVisibility(INVISIBLE);
-			arrViewFragment[1].setVisibility(INVISIBLE);
-			arrViewFragment[0].setVisibility(INVISIBLE);
 		}
 
 		@Override
@@ -465,10 +467,12 @@ public class DolmanTabLayout extends RelativeLayout{
 			tabWidget.unlockTouch();
 			isStartedAnimation = false;
 
-			arrViewFragment[0].setVisibility(VISIBLE);
-			layoutRealView.setVisibility(VISIBLE);
-			layoutAnimation.setVisibility(INVISIBLE);
-			
+			if(animation != null){
+				arrViewFragment[0].setVisibility(VISIBLE);
+				layoutRealView.setVisibility(VISIBLE);
+				layoutAnimation.setVisibility(INVISIBLE);
+			}			
+
 			// For Queue =========================
 			if(listQueue.size() > 0){
 				listQueue.remove(0);
