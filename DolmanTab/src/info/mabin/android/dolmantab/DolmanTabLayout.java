@@ -510,6 +510,9 @@ public class DolmanTabLayout extends RelativeLayout{
 			arrViewFragment[0].setVisibility(VISIBLE);
 			layoutRealView.setVisibility(VISIBLE);
 			layoutAnimation.setVisibility(INVISIBLE);
+			
+			isStartedAnimation = false;
+			tabWidget.unlockTouch();
 		}
 	};
 	
@@ -638,6 +641,8 @@ public class DolmanTabLayout extends RelativeLayout{
 							Log.d("reverse b->f", "true");
 							int tmpTabIndexNext = (tabIndexCurrent + 1) % tabAdapter.getCount();
 
+							tabAnimatorListener.onAnimationEndReverse(null);
+							
 							fragmentManager.beginTransaction()
 							.remove(tabAdapter.getItem(tabIndexNext))
 							.commit();
@@ -646,12 +651,14 @@ public class DolmanTabLayout extends RelativeLayout{
 							.replace(arrViewFragment[1].getId(), tabAdapter.getItem(tmpTabIndexNext))
 							.commit();
 
-
-
+							fragmentAnimator.setPageAnimator(pageAnimator, FragmentAnimator.Direction.Forward);
 							tabIndexNext = tmpTabIndexNext;
 
+							tabAnimatorListener.onAnimationEndReverse(null);
+							tabAnimatorListener.onAnimationStart(fragmentAnimator);
+
+
 							//						fragmentAnimator.setTarget(arrViewFragment[0], arrViewFragment[1]);
-							fragmentAnimator.setPageAnimator(pageAnimator, FragmentAnimator.Direction.Forward);
 						}
 
 					} else {
@@ -680,6 +687,9 @@ public class DolmanTabLayout extends RelativeLayout{
 
 							//						fragmentAnimator.setTarget(arrViewFragment[0], arrViewFragment[1]);
 							fragmentAnimator.setPageAnimator(pageAnimator, FragmentAnimator.Direction.Backward);
+							
+							tabAnimatorListener.onAnimationEndReverse(null);
+							tabAnimatorListener.onAnimationStart(fragmentAnimator);
 						}
 					}
 
@@ -739,8 +749,6 @@ public class DolmanTabLayout extends RelativeLayout{
 					fragmentAnimator.setDuration(100);
 					//				fragmentAnimator.cancel();
 					fragmentAnimator.reverse();
-					isStartedAnimation = false;
-					tabWidget.unlockTouch();
 				}
 				horizenScroll = false;
 				verticalScroll = false;
