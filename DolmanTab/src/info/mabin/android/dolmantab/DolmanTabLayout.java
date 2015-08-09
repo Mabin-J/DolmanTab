@@ -723,18 +723,6 @@ public class DolmanTabLayout extends RelativeLayout{
 
 		
 	}
-	
-	private class FragmentView extends FrameLayout{
-		Fragment fragment;
-		
-		public FragmentView(Context context, Fragment fragment) {
-			super(context);
-			
-			this.fragment = fragment;
-		}
-		
-		
-	}
 }
 
 
