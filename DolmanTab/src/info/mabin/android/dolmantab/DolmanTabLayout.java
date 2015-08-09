@@ -4,6 +4,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
 
+import com.nineoldandroids.animation.AnimatorSet;
+
 import info.mabin.android.dolmantab.DolmanTabInterface.PageAnimator;
 import info.mabin.android.dolmantab.DolmanTabWidget.Tab;
 import info.mabin.android.dolmantab.FragmentAnimator.Direction;
@@ -105,7 +107,6 @@ public class DolmanTabLayout extends RelativeLayout{
 		
 		setTabWidget(tmpWidget);
 
-		
 		this.getViewTreeObserver().addOnPreDrawListener(new ViewTreeObserver.OnPreDrawListener() {
 
 			@Override
@@ -286,24 +287,6 @@ public class DolmanTabLayout extends RelativeLayout{
 			fragmentAnimator.setTarget(arrViewAnimation[0], arrViewAnimation[1]);
 
 			fragmentAnimator.start();
-
-			
-			
-/*
-			if(tabIndexCurrent == 0 && targetTabIndex == tabSize - 1){
-				fragmentAnimator.setPageAnimator(pageAnimator, FragmentAnimator.Direction.Backward);
-			} else if(tabIndexCurrent == tabSize - 1 && targetTabIndex == 0){
-				fragmentAnimator.setPageAnimator(pageAnimator, FragmentAnimator.Direction.Forward);
-			} else if(tabIndexCurrent < targetTabIndex){
-				fragmentAnimator.setPageAnimator(pageAnimator, FragmentAnimator.Direction.Forward);
-			} else {
-				fragmentAnimator.setPageAnimator(pageAnimator, FragmentAnimator.Direction.Backward);
-			}
-
-			fragmentAnimator.setTarget(arrViewFragment[0], arrViewFragment[1]);
-
-			fragmentAnimator.start();
-*/
 		}
 	}
 
@@ -471,7 +454,7 @@ public class DolmanTabLayout extends RelativeLayout{
 				arrViewFragment[0].setVisibility(VISIBLE);
 				layoutRealView.setVisibility(VISIBLE);
 				layoutAnimation.setVisibility(INVISIBLE);
-			}			
+			}
 
 			// For Queue =========================
 			if(listQueue.size() > 0){
@@ -507,12 +490,17 @@ public class DolmanTabLayout extends RelativeLayout{
 
 		@Override
 		public void onAnimationEndReverse(FragmentAnimator animation) {
+/*			fragmentManager.beginTransaction()
+			.remove(tabAdapter.getItem(tabIndexNext))
+			.commit();
+*/
 			arrViewFragment[0].setVisibility(VISIBLE);
 			layoutRealView.setVisibility(VISIBLE);
 			layoutAnimation.setVisibility(INVISIBLE);
 			
 			isStartedAnimation = false;
 			tabWidget.unlockTouch();
+			Log.d("AnimatorEvent", "EndReverse");
 		}
 	};
 	
@@ -622,7 +610,6 @@ public class DolmanTabLayout extends RelativeLayout{
 			}
 			
 			if(action == MotionEvent.ACTION_DOWN || action == MotionEvent.ACTION_MOVE){
-				
 				if(verticalScroll){
 					return false;
 				}
@@ -639,34 +626,24 @@ public class DolmanTabLayout extends RelativeLayout{
 
 						if(touchDirectionBefore != touchDirectionCurrent){
 							Log.d("reverse b->f", "true");
-							int tmpTabIndexNext = (tabIndexCurrent + 1) % tabAdapter.getCount();
-
 							tabAnimatorListener.onAnimationEndReverse(null);
 							
-							fragmentManager.beginTransaction()
-							.remove(tabAdapter.getItem(tabIndexNext))
-							.commit();
-
-							fragmentManager.beginTransaction()
-							.replace(arrViewFragment[1].getId(), tabAdapter.getItem(tmpTabIndexNext))
-							.commit();
-
 							fragmentAnimator.setPageAnimator(pageAnimator, FragmentAnimator.Direction.Forward);
+
+							int tmpTabIndexNext = (tabIndexCurrent + 1) % tabAdapter.getCount();
 							tabIndexNext = tmpTabIndexNext;
 
-							tabAnimatorListener.onAnimationEndReverse(null);
 							tabAnimatorListener.onAnimationStart(fragmentAnimator);
-
-
-							//						fragmentAnimator.setTarget(arrViewFragment[0], arrViewFragment[1]);
 						}
-
 					} else {
 						touchDirectionCurrent = FragmentAnimator.Direction.Backward;
 						movePercent = ((currentX - touchStartX) / (float) layoutWidth);
 
 						if(touchDirectionBefore != touchDirectionCurrent){
 							Log.d("reverse f->b", "true");
+							
+							tabAnimatorListener.onAnimationEndReverse(null);
+							
 							int tmpTabIndexNext = 0;
 
 							if(tabIndexCurrent == 0){
@@ -675,20 +652,9 @@ public class DolmanTabLayout extends RelativeLayout{
 								tmpTabIndexNext = tabIndexCurrent - 1;
 							}
 
-							fragmentManager.beginTransaction()
-							.remove(tabAdapter.getItem(tabIndexNext))
-							.commit();
-
-							fragmentManager.beginTransaction()
-							.replace(arrViewFragment[1].getId(), tabAdapter.getItem(tmpTabIndexNext))
-							.commit();
-
-							tabIndexNext = tmpTabIndexNext;
-
-							//						fragmentAnimator.setTarget(arrViewFragment[0], arrViewFragment[1]);
 							fragmentAnimator.setPageAnimator(pageAnimator, FragmentAnimator.Direction.Backward);
+							tabIndexNext = tmpTabIndexNext;
 							
-							tabAnimatorListener.onAnimationEndReverse(null);
 							tabAnimatorListener.onAnimationStart(fragmentAnimator);
 						}
 					}
@@ -702,7 +668,7 @@ public class DolmanTabLayout extends RelativeLayout{
 				} else if(Math.abs(currentX - touchStartX) > scaledTouchSlop){
 					horizenScroll = true;
 					Log.d("scrollType", "Horizen");
-
+					
 					MotionEvent upEvent = MotionEvent.obtain(downEvent);
 					upEvent.setAction(MotionEvent.ACTION_CANCEL);
 					
@@ -723,10 +689,6 @@ public class DolmanTabLayout extends RelativeLayout{
 						touchDirectionCurrent = touchDirectionBefore = FragmentAnimator.Direction.Backward;
 					}
 
-					fragmentManager.beginTransaction()
-					.replace(arrViewFragment[1].getId(), tabAdapter.getItem(tabIndexNext))
-					.commit();
-
 					fragmentAnimator.setTarget(arrViewAnimation[0], arrViewAnimation[1]);
 
 					return true;
@@ -741,25 +703,36 @@ public class DolmanTabLayout extends RelativeLayout{
 					return false;
 				}
 				
-				isStartedAnimation = true;
+//				isStartedAnimation = true;
 
 				if(movePercent > 0.5 || Math.abs(beforeX - currentX) > scaledMinFlingVelocity){
 					fragmentAnimator.resume();
 				} else {
 					fragmentAnimator.setDuration(100);
-					//				fragmentAnimator.cancel();
 					fragmentAnimator.reverse();
 				}
 				horizenScroll = false;
 				verticalScroll = false;
 				
-				layoutRealView.dispatchTouchEvent(ev);
+//				layoutRealView.dispatchTouchEvent(ev);
 				
 				return true;
 			}
 			return true;
 		}
 
+		
+	}
+	
+	private class FragmentView extends FrameLayout{
+		Fragment fragment;
+		
+		public FragmentView(Context context, Fragment fragment) {
+			super(context);
+			
+			this.fragment = fragment;
+		}
+		
 		
 	}
 }
