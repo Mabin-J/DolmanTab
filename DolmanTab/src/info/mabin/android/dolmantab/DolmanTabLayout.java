@@ -357,15 +357,17 @@ public class DolmanTabLayout extends RelativeLayout{
 		public void onAnimationStart(FragmentAnimator animation) {
 			if(animation != null){
 				if(animation != null && animation.getDirection() == Direction.Forward){
-					arrViewAnimation[1].setVisibility(INVISIBLE);
+//					arrViewAnimation[1].setVisibility(INVISIBLE);
+//					arrViewAnimation[0].setVisibility(INVISIBLE);
 					layoutAnimation.removeView(arrViewAnimation[0]);
 					layoutAnimation.addView(arrViewAnimation[0]);
-					arrViewAnimation[1].setVisibility(VISIBLE);
+//					arrViewAnimation[1].setVisibility(VISIBLE);
 				} else {
-					arrViewAnimation[0].setVisibility(INVISIBLE);
+//					arrViewAnimation[0].setVisibility(INVISIBLE);
+					arrViewAnimation[1].setVisibility(INVISIBLE);
 					layoutAnimation.removeView(arrViewAnimation[1]);
 					layoutAnimation.addView(arrViewAnimation[1]);
-					arrViewAnimation[0].setVisibility(VISIBLE);
+//					arrViewAnimation[0].setVisibility(VISIBLE);
 				}
 			}
 			
@@ -480,6 +482,9 @@ public class DolmanTabLayout extends RelativeLayout{
 
 		@Override
 		public void onAnimationPlaying(FragmentAnimator animation, long currentTime) {
+			arrViewAnimation[1].setVisibility(VISIBLE);
+			arrViewAnimation[0].setVisibility(VISIBLE);
+
 			float ratio = currentTime / (float)animation.getDuration();
 
 			if(animation.getDirection() == Direction.Backward)
