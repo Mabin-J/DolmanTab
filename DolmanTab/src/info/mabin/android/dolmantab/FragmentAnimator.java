@@ -1,6 +1,5 @@
 package info.mabin.android.dolmantab;
 
-import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -13,8 +12,8 @@ public class FragmentAnimator implements FragmentAnimatorListener{
 	public static enum Direction{
 		Forward, Backward;
 	}
-	private BundleAnimator animatorCurrent = new BundleAnimator();
-	private BundleAnimator animatorNext = new BundleAnimator();
+	private BundleAnimator animatorCurrent = BundleAnimator.newInstance();
+	private BundleAnimator animatorNext = BundleAnimator.newInstance();
 	
 	private BundleAnimator handlerEvent;
 	
