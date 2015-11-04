@@ -1,3 +1,4 @@
 [submodule "BundleAnimatorForOld"]
 	path = BundleAnimatorForOld
 	url = https://github.com/mabin359/BundleAnimatorForOld.git
+	branch = master
